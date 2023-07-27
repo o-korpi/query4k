@@ -29,7 +29,7 @@ or invalid SQL.
 ---
 ## Documentation
 
-Complete documentation can be found at [query4k.com](www.query4k.com). 
+Todo
 
 
 ### Installation
