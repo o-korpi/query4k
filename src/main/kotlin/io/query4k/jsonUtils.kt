@@ -2,7 +2,7 @@ package io.query4k
 
 import kotlinx.serialization.json.*
 
-/** Functions for converting Any to JsonElement */
+// Functions for converting Any to JsonElement. Would've been private if it was possible with inline functions.
 
 
 
