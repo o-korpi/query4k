@@ -25,7 +25,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")  // Testing
     testImplementation(kotlin("test"))
 
-    implementation("org.postgresql:postgresql:42.3.6")  // Postgres
+    implementation("org.postgresql:postgresql:42.3.8")  // Postgres
     runtimeOnly("org.postgresql:postgresql")
 }
 
