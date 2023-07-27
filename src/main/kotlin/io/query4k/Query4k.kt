@@ -16,8 +16,17 @@ import kotlin.jvm.optionals.getOrNull
 
 class Query4k private constructor(private val jdbi: Jdbi) {
     companion object {
+        /** Create an instance from a JDBI instance. */
+        @Suppress("unused")
         fun create(jdbi: Jdbi): Query4k = Query4k(jdbi)
+
+        /** Create an instance from a data source, such as a Hikari CP data source. */
+        @Suppress("unused")
+
         fun create(dataSource: DataSource): Query4k = Query4k(Jdbi.create(dataSource))
+
+        /** Create an instance from a URL. */
+        @Suppress("unused")
         fun create(
             url: String,
             username: String? = null,
