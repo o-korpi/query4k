@@ -75,10 +75,10 @@ data class User(
     val email: String
 )
 ```
-With our model defined, we can use the `mappingQuery` method:
+With our model defined, we can use the `query` method:
 ```kotlin
-q4k.mappingQuery<User>("SELECT * FROM users")
+q4k.query<User>("SELECT * FROM users")
 ```
-Like the `execute` method, we can also provide injection-safe parameters.
+Like the `execute` method, we can also provide injection-safe parameters here.
 
 

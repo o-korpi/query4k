@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.0"
     kotlin("plugin.serialization") version "1.9.0"
+    id("maven-publish")
     application
 }
 
@@ -25,8 +26,9 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")  // Testing
     testImplementation(kotlin("test"))
 
-    implementation("org.postgresql:postgresql:42.3.8")  // Postgres
-    runtimeOnly("org.postgresql:postgresql")
+    // Not required for the library
+    //implementation("org.postgresql:postgresql:42.3.8")  // Postgres
+    //runtimeOnly("org.postgresql:postgresql")
 }
 
 tasks.test {
