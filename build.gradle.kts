@@ -4,15 +4,26 @@ plugins {
     kotlin("jvm") version "1.9.0"
     kotlin("plugin.serialization") version "1.9.0"
     id("maven-publish")
+    `java-library`
+    `maven-publish`
+    signing
     application
 }
 
 group = "io.korpi"
-version = "0.0.1"
+version = "0.0.2"
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
+
+buildscript {
+    repositories {
+        mavenLocal()
+    }
+}
+
 
 dependencies {
     implementation("org.jdbi:jdbi3-core:3.1.0")  // SQL
@@ -27,8 +38,8 @@ dependencies {
     testImplementation(kotlin("test"))
 
     // Not required for the library
-    //implementation("org.postgresql:postgresql:42.3.8")  // Postgres
-    //runtimeOnly("org.postgresql:postgresql")
+    implementation("org.postgresql:postgresql:42.3.8")  // Postgres
+    runtimeOnly("org.postgresql:postgresql")
 }
 
 tasks.test {
@@ -49,3 +60,21 @@ tasks.withType<KotlinCompile> {
 application {
     mainClass.set("MainKt")
 }
+
+
+
+publishing {
+    publications {
+        create<MavenPublication>("query4k") {
+            groupId = "io.korpi"
+            artifactId = "query4k"
+            version = "0.0.1"
+
+            pom {
+                name.set("query4k")
+            }
+            from(components["kotlin"])
+        }
+    }
+}
+

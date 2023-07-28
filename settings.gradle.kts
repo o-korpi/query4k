@@ -1,3 +1,3 @@
 
-rootProject.name = "kotlinquery"
+rootProject.name = "query4k"
 
