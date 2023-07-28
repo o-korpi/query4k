@@ -163,7 +163,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
     ): Either<SQLException, List<A>> = either {
         handle().use { handle ->
             val results = query(handle, sql, params).bind()
-            results.map { row -> row.mapTo<A>() }
+            results.map { row -> row.toType<A>() }
         }
     }
 
@@ -175,7 +175,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
     ): Either<SQLException, A?> = either {
         handle().use { handle ->
             queryFirst(handle, sql, params).bind()
-                ?.mapTo<A>()
+                ?.toType<A>()
         }
     }
 
@@ -188,7 +188,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         handle().use {  handle ->
             queryOnly(handle, sql, params)
                 .bind()
-                .mapTo<A>()
+                .toType<A>()
         }
     }
 
@@ -204,7 +204,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
     }
 }
 
-inline fun <reified A> Map<String, Any>.mapTo(): A = this
+inline fun <reified A> Map<String, Any>.toType(): A = this
     .mapValues { it.value.toJsonElement() }
     .let { Json.encodeToString(serializer(), it) }
     .let { Json.decodeFromString<A>(it) }
@@ -257,7 +257,7 @@ class Transaction internal constructor(val query4k: Query4k, val handle: Handle)
         params: Map<String, Any>? = null
     ): Either<SQLException, List<A>> = either {
         query4k.query(handle, sql, params).bind()  // todo: could be refactored
-            .map { row -> row.mapTo<A>() }
+            .map { row -> row.toType<A>() }
     }
 
     /** Gets the first result from a query, and maps it to `A`. Remaining results are ignored.
@@ -267,7 +267,7 @@ class Transaction internal constructor(val query4k: Query4k, val handle: Handle)
         params: Map<String, Any>? = null
     ): Either<SQLException, A?> = either {
         query4k.queryFirst(handle, sql, params).bind()
-            ?.mapTo<A>()
+            ?.toType<A>()
     }
 
     /** Gets one, and only one result from the query. If there are less or more `QueryOnlyError` is returned.
@@ -278,6 +278,6 @@ class Transaction internal constructor(val query4k: Query4k, val handle: Handle)
     ): Either<QueryOnlyError, A> = either {
         query4k.queryOnly(handle, sql, params)
             .bind()
-            .mapTo<A>()
+            .toType<A>()
     }
 }
