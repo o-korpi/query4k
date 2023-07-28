@@ -6,8 +6,6 @@ import arrow.core.raise.either
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.result.ResultIterable
@@ -203,11 +201,6 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         }
     }
 }
-
-inline fun <reified A> Map<String, Any>.toType(): A = this
-    .mapValues { it.value.toJsonElement() }
-    .let { Json.encodeToString(serializer(), it) }
-    .let { Json.decodeFromString<A>(it) }
 
 class Transaction internal constructor(val query4k: Query4k, val handle: Handle) {
     /** Executes a single SQL statement.

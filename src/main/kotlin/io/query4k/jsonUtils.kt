@@ -1,6 +1,7 @@
 package io.query4k
 
 import kotlinx.serialization.json.*
+import kotlinx.serialization.serializer
 
 // Functions for converting Any to JsonElement. Would've been private if it was possible with inline functions.
 
@@ -22,3 +23,7 @@ fun Iterable<*>.toJsonArray() = JsonArray(map { it.toJsonElement() })
 fun Map<*, *>.toJsonObject() = JsonObject(mapKeys { it.key.toString() }.mapValues { it.value.toJsonElement() })
 
 //fun Json.encodeToString(vararg pairs: Pair<*, *>) = encodeToString(pairs.toMap().toJsonElement())
+inline fun <reified A> Map<String, Any>.toType(): A = this
+    .mapValues { it.value.toJsonElement() }
+    .let { Json.encodeToString(serializer(), it) }
+    .let { Json.decodeFromString<A>(it) }
