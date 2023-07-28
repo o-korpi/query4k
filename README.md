@@ -2,7 +2,7 @@
 *A functional library which provides a simple and streamlined way to interact
 with SQL databases.*
 
-Most recent version: 0.0.1
+Most recent version: 0.1.0
 
 ---
 
@@ -25,6 +25,7 @@ appear. These are left unhandled by the wrappers, as they are caused by
 compilation-time issues such as missing serialization for a data class
 or invalid SQL.
 
+Tested with PostgreSQL, but should work with any SQL database.
 
 ---
 ## Documentation
@@ -50,13 +51,12 @@ download and compile the project.
 
 ### Usage
 
-First create an instance of `Query4k`, using your preferred method. 
-Example:
+First create an instance of `Query4k`, using your preferred method.
 ```kotlin
 val q4k = Query4k.create("postgresql://postgres:postgres@localhost:5432/postgres")
 ```
 
-With an instance of `Query4k`, we can now interact with our database:
+With an instance of `Query4k`, we can now interact with our database.
 ```kotlin
 q4k.execute(
     "INSERT INTO users (email) VALUES (:email)", 
@@ -81,4 +81,12 @@ q4k.query<User>("SELECT * FROM users")
 ```
 Like the `execute` method, we can also provide injection-safe parameters here.
 
+To use transactions, we make use of the self-closing `transaction` block.
+```kotlin
+q4k.transaction {
+    execute("INSERT INTO users (email) VALUES (:email)", mapOf("email" to "example"))
+    println(query<User>("SELECT * FROM users"))
+}
+```
 
+For  now the `transaction` block returns `Unit`. 
