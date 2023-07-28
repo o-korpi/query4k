@@ -15,6 +15,7 @@ import java.sql.SQLException
 import javax.sql.DataSource
 import kotlin.jvm.optionals.getOrNull
 
+
 class Query4k private constructor(private val jdbi: Jdbi) {
     companion object {
         /** Create an instance from a JDBI instance. */
@@ -162,9 +163,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
     ): Either<SQLException, List<A>> = either {
         handle().use { handle ->
             val results = query(handle, sql, params).bind()
-            results.map { row -> row.mapValues { it.value.toJsonElement() } }
-                .map { Json.encodeToString(serializer(), it) }
-                .map { Json.decodeFromString<A>(it) }
+            results.map { row -> row.mapTo<A>() }
         }
     }
 
@@ -176,9 +175,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
     ): Either<SQLException, A?> = either {
         handle().use { handle ->
             queryFirst(handle, sql, params).bind()
-                ?.mapValues { it.value.toJsonElement() }
-                ?.let { Json.encodeToString(serializer(), it) }
-                ?.let { Json.decodeFromString<A>(it) }
+                ?.mapTo<A>()
         }
     }
 
@@ -191,9 +188,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         handle().use {  handle ->
             queryOnly(handle, sql, params)
                 .bind()
-                .mapValues { it.value.toJsonElement() }
-                .let { Json.encodeToString(serializer(), it) }
-                .let { Json.decodeFromString<A>(it) }
+                .mapTo<A>()
         }
     }
 
@@ -208,6 +203,11 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         }
     }
 }
+
+inline fun <reified A> Map<String, Any>.mapTo(): A = this
+    .mapValues { it.value.toJsonElement() }
+    .let { Json.encodeToString(serializer(), it) }
+    .let { Json.decodeFromString<A>(it) }
 
 class Transaction internal constructor(val query4k: Query4k, val handle: Handle) {
     /** Executes a single SQL statement.
@@ -257,9 +257,7 @@ class Transaction internal constructor(val query4k: Query4k, val handle: Handle)
         params: Map<String, Any>? = null
     ): Either<SQLException, List<A>> = either {
         query4k.query(handle, sql, params).bind()  // todo: could be refactored
-            .map { row -> row.mapValues { it.value.toJsonElement() } }
-            .map { Json.encodeToString(serializer(), it) }
-            .map { Json.decodeFromString<A>(it) }
+            .map { row -> row.mapTo<A>() }
     }
 
     /** Gets the first result from a query, and maps it to `A`. Remaining results are ignored.
@@ -269,9 +267,7 @@ class Transaction internal constructor(val query4k: Query4k, val handle: Handle)
         params: Map<String, Any>? = null
     ): Either<SQLException, A?> = either {
         query4k.queryFirst(handle, sql, params).bind()
-            ?.mapValues { it.value.toJsonElement() }
-            ?.let { Json.encodeToString(serializer(), it) }
-            ?.let { Json.decodeFromString<A>(it) }
+            ?.mapTo<A>()
     }
 
     /** Gets one, and only one result from the query. If there are less or more `QueryOnlyError` is returned.
@@ -282,8 +278,6 @@ class Transaction internal constructor(val query4k: Query4k, val handle: Handle)
     ): Either<QueryOnlyError, A> = either {
         query4k.queryOnly(handle, sql, params)
             .bind()
-            .mapValues { it.value.toJsonElement() }
-            .let { Json.encodeToString(serializer(), it) }
-            .let { Json.decodeFromString<A>(it) }
+            .mapTo<A>()
     }
 }
