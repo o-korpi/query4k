@@ -90,3 +90,7 @@ q4k.transaction {
 ```
 
 For  now the `transaction` block returns `Unit`. 
+
+Not all types are serializable. If you need to use UUID or timestamps, you need 
+custom serializers.
+Additionally, arrays are not yet supported.
