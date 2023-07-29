@@ -14,7 +14,8 @@ import javax.sql.DataSource
 import kotlin.jvm.optionals.getOrNull
 
 
-/** Query4k */
+/** Main class for query4k. Create using the `Query4k.create(...)` methods.
+ * Does single queries. Use the `.transaction { ... }` method to create transactions. */
 class Query4k private constructor(private val jdbi: Jdbi) {
     companion object {
         /** Create an instance from a JDBI instance. */
