@@ -47,7 +47,7 @@ dependencies {
 ```
 
 For now, query4k is not on the maven repository. To use you must
-download and compile the project.
+download and compile the project, or install the jar provided in releases.
 
 ### Usage
 
