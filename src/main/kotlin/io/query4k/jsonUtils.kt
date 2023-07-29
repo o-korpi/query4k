@@ -16,7 +16,7 @@ fun Any?.toJsonElement(): JsonElement = when (this) {
     is List<*> -> this.toJsonArray()
     is Map<*, *> -> this.toJsonObject()
     is JsonElement -> this
-    else -> JsonNull
+    else -> JsonPrimitive(this?.toString())
 }
 
 fun Array<*>.toJsonArray() = JsonArray(map { it.toJsonElement() })
