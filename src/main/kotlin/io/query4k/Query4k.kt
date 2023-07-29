@@ -14,6 +14,7 @@ import javax.sql.DataSource
 import kotlin.jvm.optionals.getOrNull
 
 
+/** Query4k */
 class Query4k private constructor(private val jdbi: Jdbi) {
     companion object {
         /** Create an instance from a JDBI instance. */

@@ -1,14 +1,15 @@
 package io.query4k
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.*
 import kotlinx.serialization.serializer
 
 // Functions for converting Any to JsonElement. Would've been private if it was possible with inline functions.
 
 
-
 fun Any?.toJsonElement(): JsonElement = when (this) {
-    is Number -> JsonPrimitive(this)
+    is Number -> JsonPrimitive(this.toString())  // Convert all numbers to strings to make BigDecimal work
     is Boolean -> JsonPrimitive(this)
     is String -> JsonPrimitive(this)
     is Array<*> -> this.toJsonArray()

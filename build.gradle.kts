@@ -4,14 +4,11 @@ plugins {
     kotlin("jvm") version "1.9.0"
     kotlin("plugin.serialization") version "1.9.0"
     id("maven-publish")
-    `java-library`
-    `maven-publish`
-    signing
     application
 }
 
 group = "io.korpi"
-version = "0.1.1"
+version = "0.1.2"
 
 repositories {
     mavenCentral()
@@ -62,19 +59,21 @@ application {
 }
 
 
-
 publishing {
     publications {
-        create<MavenPublication>("query4k") {
+        create<MavenPublication>("maven") {
             groupId = "io.korpi"
             artifactId = "query4k"
-            version = "0.0.1"
+            version = "0.1.2"
 
             pom {
                 name.set("query4k")
             }
-            from(components["kotlin"])
+            from(components["java"])
         }
+    }
+    repositories {
+        mavenLocal()
     }
 }
 

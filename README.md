@@ -2,7 +2,7 @@
 *A functional library which provides a simple and streamlined way to interact
 with SQL databases.*
 
-Most recent version: 0.1.1
+Most recent version: 0.1.2
 
 ---
 
