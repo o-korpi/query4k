@@ -12,7 +12,7 @@ import javax.sql.DataSource
 import kotlin.jvm.optionals.getOrNull
 
 
-/** Main class for query4k. Create using the `Query4k.create(...)` methods.
+/** Main class for query4k. Create instance using the `Query4k.create(...)` methods.
  * Does single queries. Use the `.transaction { ... }` method to create transactions. */
 class Query4k private constructor(private val jdbi: Jdbi) {
     companion object {
@@ -20,7 +20,18 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         @Suppress("unused")
         fun create(jdbi: Jdbi): Query4k = Query4k(jdbi)
 
-        /** Create an instance from a data source, such as a Hikari CP data source. */
+        /** Create an instance from a data source, such as a Hikari CP data source.
+         * ```kotlin
+         * val datasource = HikariDataSource(
+         *     HikariConfig().apply {
+         *         jdbcUrl = "jdbc:postgresql://localhost:5432/my-database"
+         *         username = "postgres"
+         *         password = "postgres"
+         *         driverClassName = "org.postgresql.Driver"
+         *     }
+         * )
+         * val q4k = Query4k.create(datasource)
+         * ```*/
         @Suppress("unused")
         fun create(dataSource: DataSource): Query4k = Query4k(Jdbi.create(dataSource))
 
