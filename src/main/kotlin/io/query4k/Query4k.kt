@@ -146,7 +146,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
      * @param params SQL injection safe parameter inputs. Mapped to in `sql` by the use of `:myparam`.
      * @return All results mapped to target data class `A`, or wrapped `SQLException`.
      * */
-    suspend inline fun <reified A> query(
+    inline fun <reified A> query(
         sql: String,
         params: Map<String, Any>? = null
     ): Either<SQLException, List<A>> = either {
