@@ -3,6 +3,7 @@ package io.query4k
 import arrow.core.Either
 import arrow.core.raise.either
 import org.jdbi.v3.core.Handle
+import org.jetbrains.annotations.ApiStatus.Experimental
 import java.sql.SQLException
 
 class Transaction internal constructor(val query4k: Query4k, val handle: Handle) {
@@ -35,6 +36,7 @@ class Transaction internal constructor(val query4k: Query4k, val handle: Handle)
     * ```
     * Will not work when inserting multiple rows!
     */
+    @Experimental
     inline fun <reified A> executeGetKey(
         sql: String,
         key: String,

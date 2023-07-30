@@ -7,6 +7,7 @@ import kotlinx.coroutines.*
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.result.ResultIterable
+import org.jetbrains.annotations.ApiStatus.Experimental
 import java.sql.SQLException
 import javax.sql.DataSource
 import kotlin.jvm.optionals.getOrNull
@@ -119,6 +120,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
      * q4k.executeGetKey<Long>("INSERT INTO users (name) VALUES ('example')")
      * ```
      */
+    @Experimental
     inline fun <reified A> executeGetKey(
         sql: String,
         key: String,
