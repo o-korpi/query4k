@@ -27,6 +27,7 @@ Tested with PostgreSQL, but should work with any SQL database.
 ---
 ## Documentation
 
+More details at https://github.com/o-korpi/query4k/wiki/Documentation. 
 
 ### Installation
 Query4k requires Kotlinx Serialization to run. You will also need the Arrow core
