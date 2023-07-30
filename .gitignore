@@ -43,3 +43,4 @@ bin/
 
 ###
 db.sh
+db_log.txt
