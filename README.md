@@ -1,8 +1,9 @@
-# query4k
-*A functional library which provides a simple and streamlined way to interact
-with SQL databases.*
 
-Most recent version: 0.2.1
+---
+
+# query4k
+
+Most recent version: 0.3.0
 
 ---
 
@@ -32,7 +33,8 @@ Tested with PostgreSQL, but should work with any SQL database.
 
 
 ### Installation
-Query4k requires Kotlinx Serialization to run. 
+Query4k requires Kotlinx Serialization to run. You will also need the Arrow core
+library to handle results from function calls.
 
 ```kotlin
 plugins {
@@ -41,6 +43,7 @@ plugins {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("io.arrow-kt:arrow-core:1.2.0")
 }
 ```
 
