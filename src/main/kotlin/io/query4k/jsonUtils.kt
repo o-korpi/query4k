@@ -1,7 +1,5 @@
 package io.query4k
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.*
 import kotlinx.serialization.serializer
 
