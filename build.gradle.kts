@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.korpi"
-version = "0.2.1"
+version = "0.3.0"
 
 repositories {
     mavenCentral()
@@ -34,7 +34,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")  // Testing
     testImplementation(kotlin("test"))
 
-    // Not required for the library
+    // Not required for the library, only for testing
     implementation("org.postgresql:postgresql:42.3.8")  // Postgres
     runtimeOnly("org.postgresql:postgresql")
 }
@@ -64,7 +64,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "io.korpi"
             artifactId = "query4k"
-            version = "0.2.1"
+            version = "0.3.0"
 
             pom {
                 name.set("query4k")
