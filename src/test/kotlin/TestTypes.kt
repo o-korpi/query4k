@@ -70,23 +70,19 @@ class TestTypes {
     """.trimIndent()
 
     private fun setupTables() {
-        runBlocking {
-            q4k.transaction {
-                q4k.execute(testListTable)
-                q4k.execute(testBigIntTable)
-                q4k.execute(intDoubleTable)
-            }
+        q4k.transaction {
+            q4k.execute(testListTable)
+            q4k.execute(testBigIntTable)
+            q4k.execute(intDoubleTable)
         }
     }
 
     @BeforeTest
     fun before() {
         try {
-            runBlocking {
-                q4k.execute("DROP TABLE $listTableName;")
-                q4k.execute("DROP TABLE $bigIntTableName;")
-                q4k.execute("DROP TABLE $intDoubleTableName;")
-            }
+            q4k.execute("DROP TABLE $listTableName;")
+            q4k.execute("DROP TABLE $bigIntTableName;")
+            q4k.execute("DROP TABLE $intDoubleTableName;")
             setupTables()
         } catch (_: Exception) {}
     }
@@ -99,79 +95,70 @@ class TestTypes {
     @AfterEach
     fun afterEach() {
         try {
-            runBlocking {
-                q4k.execute("DROP TABLE $listTableName;")
-                q4k.execute("DROP TABLE $bigIntTableName;")
-                q4k.execute("DROP TABLE $intDoubleTableName;")
-            }
+            q4k.execute("DROP TABLE $listTableName;")
+            q4k.execute("DROP TABLE $bigIntTableName;")
+            q4k.execute("DROP TABLE $intDoubleTableName;")
         } catch (_: Exception) {}
     }
 
     @Test
     fun testListType() {
-        runBlocking {
-            val insertUnsafe = q4k.execute(
-                "INSERT INTO $listTableName (test) VALUES ('{ \"hello\", \"world\" }');"
-            )
-            assertTrue(insertUnsafe.isRight())
+        val insertUnsafe = q4k.execute(
+            "INSERT INTO $listTableName (test) VALUES ('{ \"hello\", \"world\" }');"
+        )
+        assertTrue(insertUnsafe.isRight())
 
-            println(q4k.query(q4k.handle(), "SELECT * FROM $listTableName"))
-            val query = q4k.queryOnly<TestList>("SELECT * FROM $listTableName")
-            assertTrue(query.isRight())
+        println(q4k.query(q4k.handle(), "SELECT * FROM $listTableName"))
+        val query = q4k.queryOnly<TestList>("SELECT * FROM $listTableName")
+        assertTrue(query.isRight())
 
-            val insertSafe = q4k.execute(
-                "INSERT INTO $listTableName (test) VALUES (:list)",
-                mapOf("list" to listOf("hello", "world", "again"))
-            )
-            assertTrue(insertSafe.isRight())
-            
-            assertEquals(
-                2,
-                q4k.query<TestList>("SELECT * FROM $listTableName").getOrNull()?.size
-            )
-        }
+        val insertSafe = q4k.execute(
+            "INSERT INTO $listTableName (test) VALUES (:list)",
+            mapOf("list" to listOf("hello", "world", "again"))
+        )
+        assertTrue(insertSafe.isRight())
+
+        assertEquals(
+            2,
+            q4k.query<TestList>("SELECT * FROM $listTableName").getOrNull()?.size
+        )
     }
 
     @Test
     fun `test int and double`() {
-        runBlocking {
-            val insertSafeInt = q4k.execute(
-                "INSERT INTO $intDoubleTableName (test1, test2) VALUES (:int, :double)",
-                mapOf(
-                    "int" to 5,
-                    "double" to 10.5
-                )
+        val insertSafeInt = q4k.execute(
+            "INSERT INTO $intDoubleTableName (test1, test2) VALUES (:int, :double)",
+            mapOf(
+                "int" to 5,
+                "double" to 10.5
             )
-            assertTrue(insertSafeInt.isRight())
+        )
+        assertTrue(insertSafeInt.isRight())
 
-            val query = q4k.queryOnly<TestIntAndDouble>("SELECT * FROM $intDoubleTableName")
-            assertTrue(query.isRight())
-
-        }
+        val query = q4k.queryOnly<TestIntAndDouble>("SELECT * FROM $intDoubleTableName")
+        assertTrue(query.isRight())
     }
 
     @Test
     fun testBigDecimalType() {
-        runBlocking {
-            val insertUnsafe = q4k.execute(
-                "INSERT INTO $bigIntTableName (test) VALUES (500.123);"
-            )
-            assertTrue(insertUnsafe.isRight())
+        val insertUnsafe = q4k.execute(
+            "INSERT INTO $bigIntTableName (test) VALUES (500.123);"
+        )
+        assertTrue(insertUnsafe.isRight())
 
-            val query = q4k.queryOnly<TestBigInt>("SELECT * FROM $bigIntTableName")
-            assertTrue(query.isRight())
+        val query = q4k.queryOnly<TestBigInt>("SELECT * FROM $bigIntTableName")
+        assertTrue(query.isRight())
 
-            val insertSafe = q4k.execute(
-                "INSERT INTO $bigIntTableName (test) VALUES (:value)",
-                mapOf("value" to BigDecimal.valueOf(123.5))
-            )
-            assertTrue(insertSafe.isRight())
+        val insertSafe = q4k.execute(
+            "INSERT INTO $bigIntTableName (test) VALUES (:value)",
+            mapOf("value" to BigDecimal.valueOf(123.5))
+        )
+        assertTrue(insertSafe.isRight())
 
-            assertEquals(
-                2,
-                q4k.query<TestBigInt>("SELECT * FROM $bigIntTableName").getOrNull()?.size
-            )
-        }
+        assertEquals(
+            2,
+            q4k.query<TestBigInt>("SELECT * FROM $bigIntTableName").getOrNull()?.size
+        )
     }
 
 }
