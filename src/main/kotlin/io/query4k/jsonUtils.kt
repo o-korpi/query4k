@@ -26,3 +26,6 @@ inline fun <reified A> Map<String, Any>.toType(): A = this
     .mapValues { it.value.toJsonElement() }
     .let { Json.encodeToString(serializer(), it) }
     .let { Json.decodeFromString<A>(it) }
+
+// TODO: this probably can't handle BigDecimal?
+inline fun <reified A> Any.singleToType(): A = this.let { Json.decodeFromString<A>(this.toString()) }
