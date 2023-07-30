@@ -161,4 +161,14 @@ class TestTypes {
         )
     }
 
+    @Test
+    fun testUUID() {
+        // TODO!
+    }
+
+    @Test
+    fun testTimestamp() {
+        // TODO!
+    }
+
 }

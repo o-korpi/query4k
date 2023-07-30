@@ -27,5 +27,5 @@ inline fun <reified A> Map<String, Any>.toType(): A = this
     .let { Json.encodeToString(serializer(), it) }
     .let { Json.decodeFromString<A>(it) }
 
-// TODO: this probably can't handle BigDecimal?
+// TODO: this probably can't handle UUID? Test when possible
 inline fun <reified A> Any.singleToType(): A = this.let { Json.decodeFromString<A>(this.toString()) }
