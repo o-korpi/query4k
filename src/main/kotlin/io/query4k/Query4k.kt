@@ -14,7 +14,7 @@ import kotlin.jvm.optionals.getOrNull
 
 /** Main class for query4k. Create using the `Query4k.create(...)` methods.
  * Does single queries. Use the `.transaction { ... }` method to create transactions. */
-class Query4k private constructor(private val jdbi: Jdbi, private val dispatcher: CoroutineDispatcher = Dispatchers.IO) {
+class Query4k private constructor(private val jdbi: Jdbi) {
     companion object {
         /** Create an instance from a JDBI instance. */
         @Suppress("unused")
@@ -88,46 +88,41 @@ class Query4k private constructor(private val jdbi: Jdbi, private val dispatcher
         }
     }
 
-    suspend fun query(
+    fun query(
         handle: Handle,
         sql: String,
         params: Map<String, Any>? = null
     ): Either<SQLException, List<Map<String, Any>>> = Either.catchOrThrow {
-        dispatcher.invoke {
-            handle.createQuery(sql)
-                .bindMap(params)
-                .mapToMap().list()
-        }
+        handle.createQuery(sql)
+            .bindMap(params)
+            .mapToMap().list()
     }
 
-    suspend fun queryFirst(
+    fun queryFirst(
         handle: Handle,
         sql: String,
         params: Map<String, Any>?
     ): Either<SQLException, Map<String, Any>?> = Either.catchOrThrow {
-        dispatcher.invoke {
-            handle.createQuery(sql)
-                .bindMap(params)
-                .mapToMap()
-                .findFirst()
-        }.getOrNull()
+        handle.createQuery(sql)
+            .bindMap(params)
+            .mapToMap()
+            .findFirst()
+            .getOrNull()
     }
 
     private fun ResultIterable<Map<String, Any>>.safeFindOnly() = Either.catchOrThrow<IllegalStateException, Map<String, Any>> {
         this.findOnly()
     }.mapLeft { QueryOnlyError.IllegalStateError }
 
-    suspend fun queryOnly(
+    fun queryOnly(
         handle: Handle,
         sql: String,
         params: Map<String, Any>?
     ): Either<QueryOnlyError, Map<String, Any>> = Either.catchOrThrow<SQLException, Either<QueryOnlyError.IllegalStateError, Map<String, Any>>> {
-        dispatcher.invoke {
-            handle.createQuery(sql)
-                .bindMap(params)
-                .mapToMap()
-                .safeFindOnly()
-        }
+        handle.createQuery(sql)
+            .bindMap(params)
+            .mapToMap()
+            .safeFindOnly()
     }.mapLeft {
         QueryOnlyError.ConnectionError
     }.flatten()
@@ -163,7 +158,7 @@ class Query4k private constructor(private val jdbi: Jdbi, private val dispatcher
 
     /** Gets the first result from a query, and maps it to `A`. Remaining results are ignored.
      * Similar to `query`, see documentation there. */
-    suspend inline fun <reified A> queryFirst(
+    inline fun <reified A> queryFirst(
         sql: String,
         params: Map<String, Any>? = null
     ): Either<SQLException, A?> = either {
@@ -175,7 +170,7 @@ class Query4k private constructor(private val jdbi: Jdbi, private val dispatcher
 
     /** Gets one, and only one result from the query. If there are less or more `QueryOnlyError` is returned.
      * Other than that, similar to `query`. See documentation there. */
-    suspend inline fun <reified A> queryOnly(
+    inline fun <reified A> queryOnly(
         sql: String,
         params: Map<String, Any>? = null
     ): Either<QueryOnlyError, A> = either {
