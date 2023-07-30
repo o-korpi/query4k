@@ -123,14 +123,24 @@ class TestTransaction {
 
         q4k.transaction {
             assertThrows<UnableToExecuteStatementException> {
-                runBlocking {
-                    q4k.execute(
-                        """
-                INSERT INTO unknown_table (test) VALUES ('test');
-                """.trimIndent()
-                    )
-                }
+                q4k.execute(
+                    """
+                    INSERT INTO unknown_table (test) VALUES ('test');
+                    """.trimIndent()
+                )
+
             }
+        }
+
+        assertTrue {
+            q4k.executeGetKey<Long>(
+                "INSERT INTO test_table (test) VALUES (:test)",
+                "id",
+                mapOf("test" to "test123")
+            ).also {
+                assertEquals(4L, it.getOrNull())
+                println(it.getOrNull())
+            }.isRight()
         }
     }
 
