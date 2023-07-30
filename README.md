@@ -30,8 +30,6 @@ Tested with PostgreSQL, but should work with any SQL database.
 ---
 ## Documentation
 
-Todo
-
 
 ### Installation
 Query4k requires Kotlinx Serialization to run. 
