@@ -73,7 +73,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         handle: Handle,
         sql: String,
         key: String,
-        params: Map<String, Any>?
+        params: Map<String, Any>? = null
     ): Either<SQLException, A> = Either.catchOrThrow<SQLException, A> {
         handle.createUpdate(sql)
             .bindMap(params)
