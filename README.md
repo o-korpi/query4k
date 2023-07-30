@@ -13,18 +13,14 @@ It eliminates the need for intricate setups or cumbersome ORMs,
 ensuring a user-friendly experience without the burden of handling 
 low-level intricacies.
 
-To establish a robust API, the power of the Arrow library is leveraged. This
-library uses
-JDBI as the underlying query execution library and harnesses the capabilities
+To establish a robust API, the power and
+safety from the Arrow library is leveraged. This
+library uses also harnesses the capabilities
 of Kotlinx Serialization to seamlessly convert query results to model objects. 
 
 Adding query4k to your project is as simple as decorating your data classes 
-with `@Serializable`! Query4k provides serializers for most JDBC types.
-
-Despite most functions being wrapped with typed errors, crashing errors may
-appear. These are left unhandled by the wrappers, as they are caused by
-compilation-time issues such as missing serialization for a data class
-or invalid SQL.
+with `@Serializable`! Some types may require custom serializers. In
+`io.query4k.serializers` you may find some provided serializers.
 
 Tested with PostgreSQL, but should work with any SQL database.
 
