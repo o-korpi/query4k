@@ -70,6 +70,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
             .list()
     }
 
+    @Experimental
     inline fun <reified A> executeGetKey(
         handle: Handle,
         sql: String,
