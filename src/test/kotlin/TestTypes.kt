@@ -130,74 +130,87 @@ class TestBigDecimal : TypeTest {
 
 }
 
+class TestInt : TypeTest {
 
-class TestTypes {
+    override val tableName: String = "test_table"
 
     @Serializable
-    data class TestIntAndDouble(
+    data class IntTable(
         val id: Long,
-        val test1: Int,
-        val test2: Double
+        val test: Int
     )
-    private val intDoubleTableName = "test_int_double"
-    private val intDoubleTable = """
-        CREATE TABLE $intDoubleTableName (
-            id BIGSERIAL PRIMARY KEY NOT NULL,
-            test1 INTEGER NOT NULL,
-            test2 FLOAT NOT NULL
-        );
-    """.trimIndent()
 
-    private fun setupTables() {
-        q4k.transaction {
-            q4k.execute(intDoubleTable)
+    @BeforeEach
+    override fun beforeEach() {
+        q4k.execute("""
+            CREATE TABLE $tableName (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                test INTEGER NOT NULL
+            );
+        """.trimIndent())
+    }
+
+    override fun insertRows(rowsCount: Int) {
+        (1..rowsCount).forEach { i ->
+            q4k.execute("INSERT INTO $tableName (test) VALUES :test", mapOf("test" to i))
         }
     }
 
-    @BeforeTest
-    fun before() {
-        try {
-            q4k.execute("DROP TABLE $intDoubleTableName;")
-            setupTables()
-        } catch (_: Exception) {}
+    @Test
+    fun `inserts should work`() {
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
+            mapOf("test" to 10)
+        )
+        result.shouldBeRight() shouldBeEqual 1
     }
+
+    @Test
+    fun `queries should work`() {
+        insertRows(3)
+        val result = q4k.query<IntTable>("SELECT * FROM $tableName")
+        result.shouldBeRight() shouldHaveSize 3
+    }
+}
+
+
+class TestDouble : TypeTest {
+
+    override val tableName: String = "test_table"
+
+    @Serializable
+    data class DoubleTable(
+        val id: Long,
+        val test: Double
+    )
 
     @BeforeEach
-    fun beforeEach() {
-        setupTables()
+    override fun beforeEach() {
+        q4k.execute("""
+            CREATE TABLE $tableName (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                test FLOAT NOT NULL
+            );
+        """.trimIndent())
     }
 
-    @AfterEach
-    fun afterEach() {
-        try {
-            q4k.execute("DROP TABLE $intDoubleTableName;")
-        } catch (_: Exception) {}
+    override fun insertRows(rowsCount: Int) {
+        (1..rowsCount).forEach { i ->
+            q4k.execute("INSERT INTO $tableName (test) VALUES :test", mapOf("test" to i * 2.5))
+        }
     }
-
 
     @Test
-    fun `test int and double`() {
-        val insertSafeInt = q4k.execute(
-            "INSERT INTO $intDoubleTableName (test1, test2) VALUES (:int, :double)",
-            mapOf(
-                "int" to 5,
-                "double" to 10.5
-            )
+    fun `inserts should work`() {
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
+            mapOf("test" to 10.125)
         )
-        assertTrue(insertSafeInt.isRight())
-
-        val query = q4k.queryOnly<TestIntAndDouble>("SELECT * FROM $intDoubleTableName")
-        assertTrue(query.isRight())
+        result.shouldBeRight() shouldBeEqual 1
     }
 
     @Test
-    fun testUUID() {
-        // TODO!
+    fun `queries should work`() {
+        insertRows(3)
+        val result = q4k.query<DoubleTable>("SELECT * FROM $tableName")
+        result.shouldBeRight() shouldHaveSize 3
     }
-
-    @Test
-    fun testTimestamp() {
-        // TODO!
-    }
-
 }
