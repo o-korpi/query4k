@@ -95,7 +95,18 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         sql: String,
         key: String,
         params: Map<String, Any>? = null
-    ): Either<SQLException, List<A>> = TODO()
+    ): Either<SQLException, List<A>> = Either.catchOrThrow<SQLException, List<A>> {
+        handle.createUpdate(sql)
+            .bindMap(params)
+            .executeAndReturnGeneratedKeys()
+            .mapToMap()
+            .list()
+            .map {
+                Either.catch {
+                    it[key]?.singleToType<A>() ?: throw IllegalArgumentException("There is no auto-generated key '$key' associated with this table")
+                }.mapLeft { throw IllegalArgumentException("Key '$key' cannot be mapped to ${A::class}") }.getOrNull()!!
+            }
+    }
 
     /** Executes a single SQL statement.
      * Example use:
@@ -152,7 +163,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         sql: String,
         key: String,
         params: Map<String, Any>? = null
-    ): Either<SQLException, List<A>> = TODO()
+    ): Either<SQLException, List<A>> = handle().use { executeGetKeys<A>(it, sql, key, params) }
 
     fun query(
         handle: Handle,
