@@ -2,7 +2,9 @@ import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equals.shouldBeEqual
 import io.query4k.serializers.BigDecimalSerializer
+import io.query4k.serializers.toSQLParseable
 import kotlinx.serialization.Serializable
+import kotlinx.uuid.UUID
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -207,6 +209,54 @@ class TestDouble : TypeTest {
     fun `queries should work`() {
         insertRows(3)
         val result = q4k.query<DoubleTable>("SELECT * FROM $tableName")
+        result.shouldBeRight() shouldHaveSize 3
+    }
+}
+
+class TestUUID : TypeTest {
+
+    override val tableName: String = "test_table"
+
+    @Serializable
+    data class UUIDTable(
+        val id: Long,
+        val test: UUID
+    )
+
+    @BeforeEach
+    override fun beforeEach() {
+        q4k.execute("""
+            CREATE TABLE $tableName (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                test UUID NOT NULL
+            );
+        """.trimIndent())
+    }
+
+    override fun insertRows(rowsCount: Int) {
+        (1..rowsCount).forEach { _ ->
+            q4k.execute("INSERT INTO $tableName (test) VALUES ('${UUID()}')")
+        }
+    }
+
+    @Test
+    fun `unsafe insert should work`() {
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES ('${UUID()}')")
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `inserts should work`() {
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES (:test)",
+            mapOf("test" to UUID().toSQLParseable())
+        )
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `queries should work`() {
+        insertRows(3)
+        val result = q4k.query<UUIDTable>("SELECT * FROM $tableName")
         result.shouldBeRight() shouldHaveSize 3
     }
 }
