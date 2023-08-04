@@ -26,10 +26,11 @@ buildscript {
 
 
 dependencies {
-    implementation("org.jdbi:jdbi3-core:3.1.0")  // SQL
+    implementation("org.jdbi:jdbi3-core:3.1.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")  // Types and serialization
-    //implementation("app.softwork:kotlinx-uuid-core:LATEST")
+    // Types and serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("app.softwork:kotlinx-uuid-core:0.0.21")
 
     implementation("io.arrow-kt:arrow-core:1.2.0")
     implementation("io.arrow-kt:arrow-fx-coroutines:1.2.0")
