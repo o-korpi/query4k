@@ -155,30 +155,6 @@ class TestQuery4k {
     }
 
     @Test
-    fun testQuery() {
-        populate()
-        assertTrue {
-            q4k.query<TestTable>("SELECT * FROM test_table").isRight()
-        }
-        assertEquals(10, q4k.query<TestTable>("SELECT * FROM test_table").getOrNull()?.size)
-
-        assertTrue {
-            q4k.query<TestTable>(
-                "SELECT * FROM test_table WHERE id=:id",
-                mapOf("id" to 1L)
-            ).isRight()
-        }
-
-        assertEquals(
-            "test1",
-            q4k.query<TestTable>(
-                "SELECT * FROM test_table WHERE id=:id",
-                mapOf("id" to 1L)
-            ).getOrNull()?.firstOrNull()?.test
-        )
-    }
-
-    @Test
     fun `query results should be empty if nothing exists`() {
         val result = q4k.query<TestTable>("SELECT * FROM test_table")
         result
@@ -220,66 +196,6 @@ class TestQuery4k {
         result
             .shouldBeRight()
             .shouldBeNull()
-    }
-
-    @Test
-    fun testQueryFirst() {
-        populate()
-        assertTrue {
-            q4k.queryFirst<TestTable>("SELECT * FROM test_table").isRight()
-        }
-
-        assertTrue {
-            q4k.queryFirst<TestTable>(
-                "SELECT * FROM test_table WHERE id=:id;",
-                mapOf("id" to 1L)
-            ).isRight()
-        }
-
-        assertEquals(
-            "test1",
-            q4k.queryFirst<TestTable>(
-                "SELECT * FROM test_table;"
-            ).getOrNull()?.test
-        )
-
-        assertEquals(
-            "test1",
-            q4k.queryFirst<TestTable>(
-                "SELECT * FROM test_table WHERE id=:id",
-                mapOf("id" to 1L)
-            ).getOrNull()?.test
-        )
-    }
-
-    @Test
-    fun testQueryOnly() {
-        populate()
-        assertTrue {
-            q4k.queryOnly<TestTable>("SELECT * FROM test_table").isLeft()
-        }
-
-        assertTrue {
-            q4k.queryOnly<TestTable>(
-                "SELECT * FROM test_table WHERE id=:id;",
-                mapOf("id" to 1L)
-            ).isRight()
-        }
-
-        assertNotEquals(
-            "test1",
-            q4k.queryOnly<TestTable>(
-                "SELECT * FROM test_table;"
-            ).getOrNull()?.test
-        )
-
-        assertEquals(
-            "test1",
-            q4k.queryOnly<TestTable>(
-                "SELECT * FROM test_table WHERE id=:id",
-                mapOf("id" to 1L)
-            ).getOrNull()?.test
-        )
     }
 
     @Test
