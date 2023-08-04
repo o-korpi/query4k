@@ -126,6 +126,9 @@ class TestQuery4k {
 
     @Test
     fun `executeGetKey should error on invalid mapping`() {
+        shouldThrowWithMessage<IllegalArgumentException>("Key 'id' cannot be mapped to class kotlin.String") {
+            q4k.executeGetKey<String>("INSERT INTO test_table (test) VALUES :test", "id", mapOf("test" to "Hello world!"))
+        }
     }
 
     @Test
