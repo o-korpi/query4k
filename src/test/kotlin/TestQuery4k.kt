@@ -36,13 +36,6 @@ class TestQuery4k {
 
     private val q4k = Query4k.create(dataSource)
 
-    private fun populate() {
-
-        (1..10).forEach {
-            q4k.execute("INSERT INTO test_table (test) VALUES ('test$it');") // NOT INJECTION SAFE
-        }
-    }
-
     private fun createTable() = q4k.execute(
             """
             CREATE TABLE test_table (
