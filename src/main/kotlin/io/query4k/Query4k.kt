@@ -82,7 +82,11 @@ class Query4k private constructor(private val jdbi: Jdbi) {
                 .executeAndReturnGeneratedKeys()
                 .mapToMap()
                 .findOnly()[key]
-                ?.singleToType<A>() ?: throw IllegalArgumentException("There is no auto-generated key '$key' associated with this table")
+                ?.let {
+                    Either.catch {
+                        it.singleToType<A>()
+                    }.mapLeft { throw IllegalArgumentException("Key '$key' cannot be mapped to ${A::class}") }.getOrNull()!!
+                } ?: throw IllegalArgumentException("There is no auto-generated key '$key' associated with this table")
     }
 
     /** Executes a single SQL statement.
