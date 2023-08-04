@@ -7,6 +7,7 @@ import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.assertions.throwables.shouldThrowWithMessage
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.longs.shouldBeBetween
 import io.kotest.matchers.maps.shouldHaveKey
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -89,6 +90,14 @@ class TestQuery4k {
     }
 
     @Test
+    fun `execute insert should give amount of changed rows when changing multiple rows`() {
+        val result = q4k.execute("INSERT INTO test_table (test) VALUES :test1, :test2, :test3",
+            mapOf("test1" to "Hello", "test2" to "world", "test3" to "!")
+        )
+        result.shouldBeRight() shouldBe 3
+    }
+
+    @Test
     fun `execute insert should not work for unknown tables`() {
         shouldThrowAny {
             q4k.execute("INSERT INTO unknown_table (test) VALUES ('test')")
@@ -133,7 +142,16 @@ class TestQuery4k {
 
     @Test
     fun `executeGetKeys should give keys for all inserted rows`() {
-        TODO()
+        val result = q4k.executeGetKeys<Long>("INSERT INTO test_table (test) VALUES (:test1), (:test2)",
+            "id",
+            mapOf("test1" to "hello", "test2" to "world")
+        )
+        result
+            .shouldBeRight()
+            .shouldHaveSize(2)
+            .forEach {
+                it.shouldBeBetween(1, 2)
+            }
     }
 
     @Test
