@@ -1,6 +1,15 @@
+import arrow.core.Either
+import arrow.core.toOption
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.kotest.assertions.arrow.core.shouldBeLeft
+import io.kotest.assertions.arrow.core.shouldBeNone
+import io.kotest.assertions.arrow.core.shouldBeRight
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import io.query4k.Query4k
+import io.query4k.QueryOnlyError
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException
@@ -13,22 +22,23 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 
+@Serializable
+data class TestTable(
+    val id: Long,
+    val test: String
+)
+
 class TestQuery4k {
     private val dataSource = HikariDataSource(
         HikariConfig().apply {
-            jdbcUrl = "jdbc:postgresql://localhost:5432/db"
-            username = "postgres"
-            password = "postgres"
-            driverClassName = "org.postgresql.Driver"
+            jdbcUrl = "jdbc:h2:~/test"
+            username = "sa"
+            password = ""
+            driverClassName = "org.h2.Driver"
         }
     )
-    private val q4k = Query4k.create(dataSource)
 
-    @Serializable
-    data class TestTable(
-        val id: Long,
-        val test: String
-    )
+    private val q4k = Query4k.create(dataSource)
 
     private fun populate() {
         q4k.execute(
@@ -42,6 +52,22 @@ class TestQuery4k {
 
         (1..10).forEach {
             q4k.execute("INSERT INTO test_table (test) VALUES ('test$it');") // NOT INJECTION SAFE
+        }
+    }
+
+    private fun createTable() = q4k.execute(
+            """
+            CREATE TABLE test_table (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                test VARCHAR NOT NULL
+            );
+            """.trimIndent()
+        )
+
+    private fun insertRows(rowCount: Int) {
+        createTable()
+        (1..rowCount).forEach {
+            q4k.execute("INSERT INTO test_table (test) VALUES ('test$it');")
         }
     }
 
@@ -219,5 +245,29 @@ class TestQuery4k {
         )
     }
 
+    @Test
+    fun `queryOnly should succeed if only one result exists`() {
+        insertRows(1)
+        val result: Either<QueryOnlyError, TestTable> = q4k.queryOnly<TestTable>("SELECT * FROM test_table")
+        val value = result.shouldBeRight()
+        value.id shouldBe 1L
+    }
 
+    @Test
+    fun `queryOnly should succeed when one row is taken`() {
+        insertRows(3)
+        val result: Either<QueryOnlyError, TestTable> = q4k.queryOnly<TestTable>(
+            "SELECT * FROM test_table WHERE id=:id",
+            mapOf("id" to 2L)
+        )
+        val value = result.shouldBeRight()
+        value.id shouldBe 2L
+    }
+
+    @Test
+    fun `queryOnly should fail on multiple results`() {
+        insertRows(2)
+        val result = q4k.queryOnly<TestTable>("SELECT * FROM test_table")
+        result.shouldBeLeft()
+    }
 }
