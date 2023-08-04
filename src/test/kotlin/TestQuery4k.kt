@@ -125,6 +125,10 @@ class TestQuery4k {
     }
 
     @Test
+    fun `executeGetKey should error on invalid mapping`() {
+    }
+
+    @Test
     fun `executeGetKeys should give keys for all inserted rows`() {
         TODO()
     }
