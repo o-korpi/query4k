@@ -1,31 +1,16 @@
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
-import io.query4k.Query4k
 import io.query4k.serializers.BigDecimalSerializer
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import org.jdbi.v3.core.statement.UnableToExecuteStatementException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 
 class TestTypes {
-    private val dataSource = HikariDataSource(
-        HikariConfig().apply {
-            jdbcUrl = "jdbc:postgresql://localhost:5432/db"
-            username = "postgres"
-            password = "postgres"
-            driverClassName = "org.postgresql.Driver"
-        }
-    )
-    private val q4k = Query4k.create(dataSource)
+
 
     @Serializable
     data class TestList(
