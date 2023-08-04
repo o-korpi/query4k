@@ -1,16 +1,11 @@
 import arrow.core.Either
-import arrow.core.toOption
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.kotest.assertions.arrow.core.shouldBeLeft
-import io.kotest.assertions.arrow.core.shouldBeNone
 import io.kotest.assertions.arrow.core.shouldBeRight
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.query4k.Query4k
 import io.query4k.QueryOnlyError
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException
 import org.junit.jupiter.api.AfterEach
