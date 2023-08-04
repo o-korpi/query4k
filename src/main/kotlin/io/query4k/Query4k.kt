@@ -89,6 +89,14 @@ class Query4k private constructor(private val jdbi: Jdbi) {
                 } ?: throw IllegalArgumentException("There is no auto-generated key '$key' associated with this table")
     }
 
+    @Experimental
+    inline fun <reified A> executeGetKeys(
+        handle: Handle,
+        sql: String,
+        key: String,
+        params: Map<String, Any>? = null
+    ): Either<SQLException, List<A>> = TODO()
+
     /** Executes a single SQL statement.
      * Example use:
      *
