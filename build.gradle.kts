@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val kotestVersion = "5.6"
+val kotestVersion = "5.6.2"
 
 plugins {
     kotlin("jvm") version "1.9.0"
@@ -16,6 +16,7 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
+
 
 buildscript {
     repositories {
@@ -36,10 +37,12 @@ dependencies {
     // Testing
     implementation("com.zaxxer:HikariCP:5.0.1")
     testImplementation(kotlin("test"))
-    implementation("io.kotest:kotest-runner-junit5:kotestVersion")
-    implementation("io.kotest:kotest-assertions-core:kotestVersion")
-    implementation("io.kotest:kotest-assertions-property:kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest.extensions:kotest-assertions-arrow:1.3.3")
     implementation("org.postgresql:postgresql:42.3.8")
+    implementation("com.h2database:h2:2.2.220")
+    runtimeOnly("com.h2database:h2")
     runtimeOnly("org.postgresql:postgresql")
 }
 
