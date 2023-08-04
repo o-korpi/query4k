@@ -118,7 +118,8 @@ class Query4k private constructor(private val jdbi: Jdbi) {
 
     /** Executes a _single_ SQL statement(!), and returns the auto generated key.
      * ```kotlin
-     * q4k.executeGetKey<Long>("INSERT INTO users (name) VALUES ('example')")
+     * >>> q4k.executeGetKey<Long>("INSERT INTO users (name) VALUES ('example')")
+     * 2
      * ```
      */
     @Experimental
@@ -126,7 +127,20 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         sql: String,
         key: String,
         params: Map<String, Any>? = null
-    ) = handle().use { executeGetKey<A>(it, sql, key, params) }
+    ): Either<SQLException, A> = handle().use { executeGetKey<A>(it, sql, key, params) }
+
+    /** Executes a SQL statement, and returns all instances of the auto generated key
+     * ```kotlin
+     * >>> q4k.executeGetKeys<Long>("INSERT INTO users (name) VALUES ('example')")
+     * [6, 7, 8, 9]
+     * ```
+     */
+    @Experimental
+    inline fun <reified A> executeGetKeys(
+        sql: String,
+        key: String,
+        params: Map<String, Any>? = null
+    ): Either<SQLException, List<A>> = TODO()
 
     fun query(
         handle: Handle,
