@@ -21,7 +21,7 @@ class TestTypes {
     private val testListTable = """
         CREATE TABLE $listTableName (
             id BIGSERIAL PRIMARY KEY NOT NULL,
-            test TEXT[] NOT NULL
+            test INTEGER ARRAY NOT NULL
         );
     """.trimIndent()
 
@@ -35,7 +35,7 @@ class TestTypes {
     private val testBigIntTable = """
         CREATE TABLE $bigIntTableName (
             id BIGSERIAL PRIMARY KEY NOT NULL,
-            test NUMERIC NOT NULL
+            test NUMBER NOT NULL
         );
     """.trimIndent()
 
