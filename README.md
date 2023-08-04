@@ -22,7 +22,7 @@ Adding query4k to your project is as simple as decorating your data classes
 with `@Serializable`! Some types may require custom serializers. In
 `io.query4k.serializers` you may find some provided serializers.
 
-Tested with PostgreSQL, but should work with any SQL database.
+Tested with H2 and PostgreSQL; should work with any SQL database.
 
 ---
 ## Documentation
