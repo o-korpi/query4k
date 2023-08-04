@@ -78,22 +78,60 @@ class TestList : TypeTest {
     }
 }
 
-
-class TestTypes {
+class TestBigDecimal : TypeTest {
+    override val tableName: String = "test_table"
 
     @Serializable
-    data class TestBigInt(
+    data class BigDecimalTable(
         val id: Long,
         @Serializable(with = BigDecimalSerializer::class)
         val test: BigDecimal
     )
-    private val bigIntTableName = "test_big_int"
-    private val testBigIntTable = """
-        CREATE TABLE $bigIntTableName (
-            id BIGSERIAL PRIMARY KEY NOT NULL,
-            test NUMBER NOT NULL
-        );
-    """.trimIndent()
+
+    @BeforeEach
+    override fun beforeEach() {
+        q4k.execute("""
+            CREATE TABLE $tableName (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                test NUMBER NOT NULL
+            );
+        """.trimIndent())
+    }
+
+    override fun insertRows(rowsCount: Int) {
+        (1..rowsCount).forEach { i ->
+            q4k.execute("INSERT INTO $tableName (test) VALUES :test", mapOf("test" to ((i * 10) / 2).toBigDecimal()))
+        }
+    }
+
+    @Test
+    fun `unsafe insert should work`() {
+        val result = q4k.execute(
+            "INSERT INTO $tableName (test) VALUES (500.123);"
+        )
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `normal insert should work`() {
+        val result = q4k.execute(
+            "INSERT INTO $tableName (test) VALUES (:value)",
+            mapOf("value" to BigDecimal.valueOf(123.5))
+        )
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `query should work and be able to map to BigDecimal`() {
+        insertRows(5)
+        val result = q4k.query<BigDecimalTable>("SELECT * FROM $tableName")
+        result.shouldBeRight() shouldHaveSize 5
+    }
+
+}
+
+
+class TestTypes {
 
     @Serializable
     data class TestIntAndDouble(
@@ -112,7 +150,6 @@ class TestTypes {
 
     private fun setupTables() {
         q4k.transaction {
-            q4k.execute(testBigIntTable)
             q4k.execute(intDoubleTable)
         }
     }
@@ -120,7 +157,6 @@ class TestTypes {
     @BeforeTest
     fun before() {
         try {
-            q4k.execute("DROP TABLE $bigIntTableName;")
             q4k.execute("DROP TABLE $intDoubleTableName;")
             setupTables()
         } catch (_: Exception) {}
@@ -134,7 +170,6 @@ class TestTypes {
     @AfterEach
     fun afterEach() {
         try {
-            q4k.execute("DROP TABLE $bigIntTableName;")
             q4k.execute("DROP TABLE $intDoubleTableName;")
         } catch (_: Exception) {}
     }
@@ -153,28 +188,6 @@ class TestTypes {
 
         val query = q4k.queryOnly<TestIntAndDouble>("SELECT * FROM $intDoubleTableName")
         assertTrue(query.isRight())
-    }
-
-    @Test
-    fun testBigDecimalType() {
-        val insertUnsafe = q4k.execute(
-            "INSERT INTO $bigIntTableName (test) VALUES (500.123);"
-        )
-        assertTrue(insertUnsafe.isRight())
-
-        val query = q4k.queryOnly<TestBigInt>("SELECT * FROM $bigIntTableName")
-        assertTrue(query.isRight())
-
-        val insertSafe = q4k.execute(
-            "INSERT INTO $bigIntTableName (test) VALUES (:value)",
-            mapOf("value" to BigDecimal.valueOf(123.5))
-        )
-        assertTrue(insertSafe.isRight())
-
-        assertEquals(
-            2,
-            q4k.query<TestBigInt>("SELECT * FROM $bigIntTableName").getOrNull()?.size
-        )
     }
 
     @Test
