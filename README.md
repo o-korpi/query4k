@@ -44,6 +44,12 @@ dependencies {
 }
 ```
 
+If you want to make use of UUIDs you also need the following dependency:
+`implementation("app.softwork:kotlinx-uuid-core:0.0.21")`
+
+For now, UUIDs cannot be inserted in an injection-safe manner, and direct insertions
+together with `.toSQLParseable()` are necessary.
+
 Query4k is not yet on the maven repository. To use you must
 download and compile the project, or install the jar provided in releases.
 
