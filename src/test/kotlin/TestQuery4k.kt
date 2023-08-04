@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariDataSource
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.assertions.throwables.shouldThrowAny
+import io.kotest.assertions.throwables.shouldThrowWithMessage
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldHaveKey
@@ -118,7 +119,9 @@ class TestQuery4k {
 
     @Test
     fun `executeGetKey should error on invalid key`() {
-        val result = q4k.executeGetKey<Long>("INSERT INTO test_table (test) VALUES :test", "invalidKey", mapOf("test" to "Hello world!"))
+        shouldThrowWithMessage<IllegalArgumentException>("There is no auto-generated key 'invalidKey' associated with this table") {
+            q4k.executeGetKey<Long>("INSERT INTO test_table (test) VALUES :test", "invalidKey", mapOf("test" to "Hello world!"))
+        }
     }
 
     @Test

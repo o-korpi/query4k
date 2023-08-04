@@ -78,11 +78,11 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         params: Map<String, Any>? = null
     ): Either<SQLException, A> = Either.catchOrThrow<SQLException, A> {
         handle.createUpdate(sql)
-            .bindMap(params)
-            .executeAndReturnGeneratedKeys()
-            .mapToMap()
-            .findOnly()[key]!!
-            .singleToType<A>()
+                .bindMap(params)
+                .executeAndReturnGeneratedKeys()
+                .mapToMap()
+                .findOnly()[key]
+                ?.singleToType<A>() ?: throw IllegalArgumentException("There is no auto-generated key '$key' associated with this table")
     }
 
     /** Executes a single SQL statement.
