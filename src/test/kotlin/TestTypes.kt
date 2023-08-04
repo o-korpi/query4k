@@ -1,3 +1,7 @@
+import io.kotest.assertions.arrow.core.shouldBeRight
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.equals.shouldBeEqual
+import io.kotest.matchers.shouldBe
 import io.query4k.serializers.BigDecimalSerializer
 import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.AfterEach
@@ -9,21 +13,73 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 
-class TestTypes {
+interface TypeTest {
+    val tableName: String
 
+    @BeforeEach
+    fun beforeEach()
+
+    @AfterEach
+    fun afterEach() { q4k.execute("DROP TABLE $tableName") }
+
+    fun insertRows(rowsCount: Int)
+}
+
+class TestList : TypeTest {
+    override val tableName = "list_table"
 
     @Serializable
-    data class TestList(
+    data class ListTable(
         val id: Long,
-        val test: List<String>
+        val test: List<Int>
     )
-    private val listTableName = "test_list"
-    private val testListTable = """
-        CREATE TABLE $listTableName (
-            id BIGSERIAL PRIMARY KEY NOT NULL,
-            test INTEGER ARRAY NOT NULL
-        );
-    """.trimIndent()
+
+    @BeforeEach
+    override fun beforeEach() {
+        q4k.execute("""
+            CREATE TABLE $tableName (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                test INTEGER ARRAY NOT NULL
+            );
+        """.trimIndent())
+    }
+
+    override fun insertRows(rowsCount: Int) {
+        (1..rowsCount).forEach { i ->
+            q4k.execute(
+                "INSERT INTO $tableName (test) VALUES :list",
+                mapOf("list" to listOf(1, 2, 3, 4, i))
+            )
+        }
+    }
+
+    @Test
+    fun `test unsafe list insert`() {
+        val result = q4k.execute(
+            "INSERT INTO $tableName (test) VALUES ({1, 2});"
+        )
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `test safe insert`() {
+        val result = q4k.execute(
+            "INSERT INTO $tableName (test) VALUES :list",
+            mapOf("list" to listOf(1, 2, 3))
+        )
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `query should pass`() {
+        insertRows(10)
+        val result = q4k.query<ListTable>("SELECT * FROM $tableName")
+        result.shouldBeRight() shouldHaveSize 10
+    }
+}
+
+
+class TestTypes {
 
     @Serializable
     data class TestBigInt(
@@ -56,7 +112,6 @@ class TestTypes {
 
     private fun setupTables() {
         q4k.transaction {
-            q4k.execute(testListTable)
             q4k.execute(testBigIntTable)
             q4k.execute(intDoubleTable)
         }
@@ -65,7 +120,6 @@ class TestTypes {
     @BeforeTest
     fun before() {
         try {
-            q4k.execute("DROP TABLE $listTableName;")
             q4k.execute("DROP TABLE $bigIntTableName;")
             q4k.execute("DROP TABLE $intDoubleTableName;")
             setupTables()
@@ -80,34 +134,11 @@ class TestTypes {
     @AfterEach
     fun afterEach() {
         try {
-            q4k.execute("DROP TABLE $listTableName;")
             q4k.execute("DROP TABLE $bigIntTableName;")
             q4k.execute("DROP TABLE $intDoubleTableName;")
         } catch (_: Exception) {}
     }
 
-    @Test
-    fun testListType() {
-        val insertUnsafe = q4k.execute(
-            "INSERT INTO $listTableName (test) VALUES ('{ \"hello\", \"world\" }');"
-        )
-        assertTrue(insertUnsafe.isRight())
-
-        println(q4k.query(q4k.handle(), "SELECT * FROM $listTableName"))
-        val query = q4k.queryOnly<TestList>("SELECT * FROM $listTableName")
-        assertTrue(query.isRight())
-
-        val insertSafe = q4k.execute(
-            "INSERT INTO $listTableName (test) VALUES (:list)",
-            mapOf("list" to listOf("hello", "world", "again"))
-        )
-        assertTrue(insertSafe.isRight())
-
-        assertEquals(
-            2,
-            q4k.query<TestList>("SELECT * FROM $listTableName").getOrNull()?.size
-        )
-    }
 
     @Test
     fun `test int and double`() {
