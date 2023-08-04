@@ -41,14 +41,6 @@ class TestQuery4k {
     private val q4k = Query4k.create(dataSource)
 
     private fun populate() {
-        q4k.execute(
-            """
-            CREATE TABLE test_table (
-                id BIGSERIAL PRIMARY KEY NOT NULL,
-                test VARCHAR NOT NULL
-            );
-            """.trimIndent()
-        )
 
         (1..10).forEach {
             q4k.execute("INSERT INTO test_table (test) VALUES ('test$it');") // NOT INJECTION SAFE
@@ -70,8 +62,7 @@ class TestQuery4k {
         }
     }
 
-    @BeforeTest
-    fun before() {
+    private fun dropTable() {
         try {
             q4k.execute("DROP TABLE test_table;")
         } catch (_: Exception) {}
@@ -84,9 +75,7 @@ class TestQuery4k {
 
     @AfterEach
     fun afterEach() {
-        try {
-            q4k.execute("DROP TABLE test_table;")
-        } catch (_: Exception) {}
+        dropTable()
     }
 
     @Test
