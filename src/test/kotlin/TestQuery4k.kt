@@ -117,6 +117,16 @@ class TestQuery4k {
     }
 
     @Test
+    fun `executeGetKey should error on invalid key`() {
+        val result = q4k.executeGetKey<Long>("INSERT INTO test_table (test) VALUES :test", "invalidKey", mapOf("test" to "Hello world!"))
+    }
+
+    @Test
+    fun `executeGetKeys should give keys for all inserted rows`() {
+        TODO()
+    }
+
+    @Test
     fun `query results should be empty if nothing exists`() {
         val result = q4k.query<TestTable>("SELECT * FROM test_table")
         result
