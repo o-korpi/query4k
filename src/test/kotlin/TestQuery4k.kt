@@ -3,12 +3,17 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.query4k.Query4k
 import io.query4k.QueryOnlyError
 import kotlinx.serialization.Serializable
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.BeforeTest
@@ -60,7 +65,6 @@ class TestQuery4k {
         )
 
     private fun insertRows(rowCount: Int) {
-        createTable()
         (1..rowCount).forEach {
             q4k.execute("INSERT INTO test_table (test) VALUES ('test$it');")
         }
@@ -71,6 +75,11 @@ class TestQuery4k {
         try {
             q4k.execute("DROP TABLE test_table;")
         } catch (_: Exception) {}
+    }
+
+    @BeforeEach
+    fun beforeEach() {
+        createTable()
     }
 
     @AfterEach
@@ -181,6 +190,50 @@ class TestQuery4k {
     }
 
     @Test
+    fun `query results should be empty if nothing exists`() {
+        val result = q4k.query<TestTable>("SELECT * FROM test_table")
+        result
+            .shouldBeRight()
+            .shouldBeEmpty()
+    }
+
+    @Test
+    fun `query results should contain one element if only one exists`() {
+        insertRows(10)
+        val result = q4k.query<TestTable>("SELECT * FROM test_table WHERE id=:id", mapOf("id" to 3L))
+        result
+            .shouldBeRight()
+            .shouldHaveSize(1)
+    }
+
+    @Test
+    fun `query should pass for a 'standard' query`() {
+        insertRows(100)
+        val result = q4k.query<TestTable>("SELECT * FROM test_table")
+        result
+            .shouldBeRight()
+            .shouldHaveSize(100)
+    }
+
+    @Test
+    fun `queryFirst should only get the first result from multiple matching rows`() {
+        insertRows(25)
+        val result = q4k.queryFirst<TestTable>("SELECT * FROM test_table WHERE id>= :id", mapOf("id" to 15L))
+        result
+            .shouldBeRight()
+            .shouldNotBeNull()
+            .id shouldBe 15L
+    }
+
+    @Test
+    fun `queryFirst should be null if no results are found`() {
+        val result = q4k.queryFirst<TestTable>("SELECT * FROM test_table")
+        result
+            .shouldBeRight()
+            .shouldBeNull()
+    }
+
+    @Test
     fun testQueryFirst() {
         populate()
         assertTrue {
@@ -262,6 +315,12 @@ class TestQuery4k {
     @Test
     fun `queryOnly should fail on multiple results`() {
         insertRows(2)
+        val result = q4k.queryOnly<TestTable>("SELECT * FROM test_table")
+        result.shouldBeLeft()
+    }
+
+    @Test
+    fun `queryOnly should fail on no results`() {
         val result = q4k.queryOnly<TestTable>("SELECT * FROM test_table")
         result.shouldBeLeft()
     }
