@@ -3,6 +3,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equals.shouldBeEqual
 import io.query4k.serializers.BigDecimalSerializer
 import io.query4k.serializers.toSQLParseable
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.uuid.UUID
 import org.junit.jupiter.api.AfterEach
@@ -260,3 +261,55 @@ class TestUUID : TypeTest {
         result.shouldBeRight() shouldHaveSize 3
     }
 }
+
+
+class TestDateTime : TypeTest {
+
+    override val tableName: String = "test_table"
+
+    @Serializable
+    data class TimeTable(
+        val id: Long,
+        val test: LocalDateTime
+    )
+
+    @BeforeEach
+    override fun beforeEach() {
+        q4k.execute("""
+            CREATE TABLE $tableName (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                test TIMESTAMP NOT NULL
+            );
+        """.trimIndent())
+    }
+
+    override fun insertRows(rowsCount: Int) {
+        (1..rowsCount).forEach { i ->
+            q4k.execute("INSERT INTO $tableName (test) VALUES ('${LocalDateTime(2023, 8, 5, 12, i)}')")
+        }
+    }
+
+    @Test
+    fun `unsafe insert should work`() {
+        val dateTime = LocalDateTime(2023, 8, 5, 12, 30)
+        println(dateTime.toString())
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES ('$dateTime')")
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `inserts should work`() {
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
+            mapOf("test" to LocalDateTime(2023, 8, 5, 12, 30))
+        )
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `queries should work`() {
+        insertRows(3)
+        val result = q4k.query<TimeTable>("SELECT * FROM $tableName")
+        result.shouldBeRight() shouldHaveSize 3
+    }
+}
+
