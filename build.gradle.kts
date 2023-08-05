@@ -31,6 +31,7 @@ dependencies {
     // Types and serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation("app.softwork:kotlinx-uuid-core:0.0.21")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
     implementation("io.arrow-kt:arrow-core:1.2.0")
     implementation("io.arrow-kt:arrow-fx-coroutines:1.2.0")
