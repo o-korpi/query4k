@@ -3,7 +3,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equals.shouldBeEqual
 import io.query4k.serializers.BigDecimalSerializer
 import io.query4k.serializers.toSQLParseable
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.*
 import kotlinx.serialization.Serializable
 import kotlinx.uuid.UUID
 import org.junit.jupiter.api.AfterEach
@@ -263,6 +263,58 @@ class TestUUID : TypeTest {
 }
 
 
+class TestTime : TypeTest {
+
+    override val tableName: String = "test_table"
+
+    @Serializable
+    data class TimeTable(
+        val id: Long,
+        val test: LocalTime
+    )
+
+    @BeforeEach
+    override fun beforeEach() {
+        q4k.execute("""
+            CREATE TABLE $tableName (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                test TIME NOT NULL
+            );
+        """.trimIndent())
+    }
+
+    override fun insertRows(rowsCount: Int) {
+        (1..rowsCount).forEach { i ->
+            q4k.execute("INSERT INTO $tableName (test) VALUES ('${Clock.System.now().toLocalDateTime(TimeZone.UTC).time}')")
+        }
+    }
+
+    @Test
+    fun `unsafe insert should work`() {
+        val time: LocalTime = Clock.System.now().toLocalDateTime(TimeZone.UTC).time
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES ('$time')")
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `inserts should work`() {
+        val time: LocalTime = Clock.System.now().toLocalDateTime(TimeZone.UTC).time
+        println(time.toString())
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
+            mapOf("test" to time.toSQLParseable())
+        )
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `queries should work`() {
+        insertRows(3)
+        val result = q4k.query<TimeTable>("SELECT * FROM $tableName")
+        result.shouldBeRight() shouldHaveSize 3
+    }
+}
+
+
 class TestDateTime : TypeTest {
 
     override val tableName: String = "test_table"
@@ -300,7 +352,7 @@ class TestDateTime : TypeTest {
     @Test
     fun `inserts should work`() {
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
-            mapOf("test" to LocalDateTime(2023, 8, 5, 12, 30))
+            mapOf("test" to LocalDateTime(2023, 8, 5, 12, 30).toSQLParseable())
         )
         result.shouldBeRight() shouldBeEqual 1
     }
