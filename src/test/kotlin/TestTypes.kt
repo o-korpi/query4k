@@ -315,6 +315,57 @@ class TestTime : TypeTest {
 }
 
 
+class TestDate : TypeTest {
+
+    override val tableName: String = "test_table"
+
+    @Serializable
+    data class DateTable(
+        val id: Long,
+        val test: LocalDate
+    )
+
+    @BeforeEach
+    override fun beforeEach() {
+        q4k.execute("""
+            CREATE TABLE $tableName (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                test DATE NOT NULL
+            );
+        """.trimIndent())
+    }
+
+    override fun insertRows(rowsCount: Int) {
+        (1..rowsCount).forEach { i ->
+            q4k.execute("INSERT INTO $tableName (test) VALUES ('${LocalDate(2023, 4, i)}')")
+        }
+    }
+
+    @Test
+    fun `unsafe insert should work`() {
+        val date: LocalDate = LocalDate(2023, 8, 5)
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES ('$date')")
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `inserts should work`() {
+        val date: LocalDate = LocalDate(2023, 8, 5)
+        val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
+            mapOf("test" to date.toSQLParseable())
+        )
+        result.shouldBeRight() shouldBeEqual 1
+    }
+
+    @Test
+    fun `queries should work`() {
+        insertRows(3)
+        val result = q4k.query<DateTable>("SELECT * FROM $tableName")
+        result.shouldBeRight() shouldHaveSize 3
+    }
+}
+
+
 class TestDateTime : TypeTest {
 
     override val tableName: String = "test_table"
