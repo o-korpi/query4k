@@ -57,7 +57,7 @@ class TestList : TypeTest {
         val result = q4k.execute(
             "INSERT INTO $tableName (test) VALUES ({1, 2});"
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -66,7 +66,7 @@ class TestList : TypeTest {
             "INSERT INTO $tableName (test) VALUES :list",
             mapOf("list" to listOf(1, 2, 3))
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -108,7 +108,7 @@ class TestBigDecimal : TypeTest {
         val result = q4k.execute(
             "INSERT INTO $tableName (test) VALUES (500.123);"
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -117,7 +117,7 @@ class TestBigDecimal : TypeTest {
             "INSERT INTO $tableName (test) VALUES (:value)",
             mapOf("value" to BigDecimal.valueOf(123.5))
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -160,7 +160,7 @@ class TestInt : TypeTest {
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
             mapOf("test" to 10)
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -203,7 +203,7 @@ class TestDouble : TypeTest {
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
             mapOf("test" to 10.125)
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -243,7 +243,7 @@ class TestUUID : TypeTest {
     @Test
     fun `unsafe insert should work`() {
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES ('${UUID()}')")
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -251,7 +251,7 @@ class TestUUID : TypeTest {
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES (:test)",
             mapOf("test" to UUID().toSQLParseable())
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -293,7 +293,7 @@ class TestTime : TypeTest {
     fun `unsafe insert should work`() {
         val time: LocalTime = Clock.System.now().toLocalDateTime(TimeZone.UTC).time
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES ('$time')")
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -303,7 +303,7 @@ class TestTime : TypeTest {
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
             mapOf("test" to time.toSQLParseable())
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -345,7 +345,7 @@ class TestDate : TypeTest {
     fun `unsafe insert should work`() {
         val date: LocalDate = LocalDate(2023, 8, 5)
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES ('$date')")
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -354,7 +354,7 @@ class TestDate : TypeTest {
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
             mapOf("test" to date.toSQLParseable())
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -397,7 +397,7 @@ class TestDateTime : TypeTest {
         val dateTime = LocalDateTime(2023, 8, 5, 12, 30)
         println(dateTime.toString())
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES ('$dateTime')")
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -405,7 +405,7 @@ class TestDateTime : TypeTest {
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
             mapOf("test" to LocalDateTime(2023, 8, 5, 12, 30).toSQLParseable())
         )
-        result.shouldBeRight() shouldBeEqual 1
+        result shouldBeEqual 1
     }
 
     @Test

@@ -7,6 +7,7 @@ import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.assertions.throwables.shouldThrowWithMessage
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.longs.shouldBeBetween
 import io.kotest.matchers.maps.shouldHaveKey
 import io.kotest.matchers.nulls.shouldBeNull
@@ -80,13 +81,13 @@ class TestQuery4k {
             );
             """.trimIndent()
         )
-        result.shouldBeRight()
+        result shouldBeEqual 0
     }
 
     @Test
     fun `execute insert should give amount of changed rows`() {
         val result = q4k.execute("INSERT INTO test_table (test) VALUES :test", mapOf("test" to "Hello world!"))
-        result.shouldBeRight() shouldBe 1
+        result shouldBeEqual 1
     }
 
     @Test
@@ -94,7 +95,7 @@ class TestQuery4k {
         val result = q4k.execute("INSERT INTO test_table (test) VALUES :test1, :test2, :test3",
             mapOf("test1" to "Hello", "test2" to "world", "test3" to "!")
         )
-        result.shouldBeRight() shouldBe 3
+        result shouldBeEqual 3
     }
 
     @Test
