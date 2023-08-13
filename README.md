@@ -93,7 +93,6 @@ q4k.transaction {
 }
 ```
 
-For  now the `transaction` block returns `Unit`. 
 
 ### Type support
 
