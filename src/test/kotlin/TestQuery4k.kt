@@ -21,13 +21,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 
-@Serializable
-data class TestTable(
-    val id: Long,
-    val test: String
-)
-
 class TestQuery4k {
+    @Serializable
+    data class TestTable(
+        val id: Long,
+        val test: String
+    )
+
     private val dataSource = HikariDataSource(
         HikariConfig().apply {
             jdbcUrl = "jdbc:h2:~/test"
