@@ -7,22 +7,20 @@ Most recent version: 1.0.0
 
 ---
 
+Interact with your database in a safe and efficient manner, without the 
+burden of ORMs. 
+
 Query4k was developed with the aim of offering a straightforward and 
 simple solution for accessing your database. 
 It eliminates the need for intricate setups or cumbersome ORMs, 
 ensuring a user-friendly experience without the burden of handling 
 low-level intricacies.
 
-To establish a robust API, the power and
-safety from the Arrow library is leveraged. This
-library uses also harnesses the capabilities
-of Kotlinx Serialization to seamlessly convert query results to model objects. 
 
 Adding query4k to your project is as simple as decorating your data classes 
-with `@Serializable`! Some types may require custom serializers. In
-`io.query4k.serializers` you may find some provided serializers.
+with `@Serializable`! 
 
-Tested with H2 and PostgreSQL; should work with any SQL database.
+Tested with H2 and PostgreSQL, should work with any SQL database.
 
 ---
 ## Documentation
