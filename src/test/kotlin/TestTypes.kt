@@ -73,7 +73,7 @@ class TestList : TypeTest {
     fun `query should pass`() {
         insertRows(10)
         val result = q4k.query<ListTable>("SELECT * FROM $tableName")
-        result.shouldBeRight() shouldHaveSize 10
+        result shouldHaveSize 10
     }
 }
 
@@ -124,7 +124,7 @@ class TestBigDecimal : TypeTest {
     fun `query should work and be able to map to BigDecimal`() {
         insertRows(5)
         val result = q4k.query<BigDecimalTable>("SELECT * FROM $tableName")
-        result.shouldBeRight() shouldHaveSize 5
+        result shouldHaveSize 5
     }
 
 }
@@ -167,7 +167,7 @@ class TestInt : TypeTest {
     fun `queries should work`() {
         insertRows(3)
         val result = q4k.query<IntTable>("SELECT * FROM $tableName")
-        result.shouldBeRight() shouldHaveSize 3
+        result shouldHaveSize 3
     }
 }
 
@@ -210,7 +210,7 @@ class TestDouble : TypeTest {
     fun `queries should work`() {
         insertRows(3)
         val result = q4k.query<DoubleTable>("SELECT * FROM $tableName")
-        result.shouldBeRight() shouldHaveSize 3
+        result shouldHaveSize 3
     }
 }
 
@@ -258,7 +258,7 @@ class TestUUID : TypeTest {
     fun `queries should work`() {
         insertRows(3)
         val result = q4k.query<UUIDTable>("SELECT * FROM $tableName")
-        result.shouldBeRight() shouldHaveSize 3
+        result shouldHaveSize 3
     }
 }
 
@@ -310,7 +310,7 @@ class TestTime : TypeTest {
     fun `queries should work`() {
         insertRows(3)
         val result = q4k.query<TimeTable>("SELECT * FROM $tableName")
-        result.shouldBeRight() shouldHaveSize 3
+        result shouldHaveSize 3
     }
 }
 
@@ -361,7 +361,7 @@ class TestDate : TypeTest {
     fun `queries should work`() {
         insertRows(3)
         val result = q4k.query<DateTable>("SELECT * FROM $tableName")
-        result.shouldBeRight() shouldHaveSize 3
+        result shouldHaveSize 3
     }
 }
 
@@ -412,7 +412,7 @@ class TestDateTime : TypeTest {
     fun `queries should work`() {
         insertRows(3)
         val result = q4k.query<TimeTable>("SELECT * FROM $tableName")
-        result.shouldBeRight() shouldHaveSize 3
+        result shouldHaveSize 3
     }
 }
 

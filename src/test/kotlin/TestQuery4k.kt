@@ -158,45 +158,35 @@ class TestQuery4k {
     @Test
     fun `query results should be empty if nothing exists`() {
         val result = q4k.query<TestTable>("SELECT * FROM test_table")
-        result
-            .shouldBeRight()
-            .shouldBeEmpty()
+        result.shouldBeEmpty()
     }
 
     @Test
     fun `query results should contain one element if only one exists`() {
         insertRows(10)
         val result = q4k.query<TestTable>("SELECT * FROM test_table WHERE id=:id", mapOf("id" to 3L))
-        result
-            .shouldBeRight()
-            .shouldHaveSize(1)
+        result.shouldHaveSize(1)
     }
 
     @Test
     fun `query should pass for a 'standard' query`() {
         insertRows(100)
         val result = q4k.query<TestTable>("SELECT * FROM test_table")
-        result
-            .shouldBeRight()
-            .shouldHaveSize(100)
+        result.shouldHaveSize(100)
     }
 
     @Test
     fun `queryFirst should only get the first result from multiple matching rows`() {
         insertRows(25)
         val result = q4k.queryFirst<TestTable>("SELECT * FROM test_table WHERE id>= :id", mapOf("id" to 15L))
-        result
-            .shouldBeRight()
-            .shouldNotBeNull()
+        result.shouldNotBeNull()
             .id shouldBe 15L
     }
 
     @Test
     fun `queryFirst should be null if no results are found`() {
         val result = q4k.queryFirst<TestTable>("SELECT * FROM test_table")
-        result
-            .shouldBeRight()
-            .shouldBeNull()
+        result.shouldBeNull()
     }
 
     @Test
