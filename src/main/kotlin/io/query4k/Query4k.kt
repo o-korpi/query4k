@@ -232,7 +232,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
             queryFirst(handle, sql, params)?.toType<A>()
     }
 
-    /** Gets one, and only one result from the query. If there are less or more `QueryOnlyError` is returned.
+    /** Gets one, and only one result from the query. If there are less or more `QueryOnlyException` is returned.
      * Other than that, similar to `query`. See documentation there. */
     inline fun <reified A> queryOnly(
         sql: String,
