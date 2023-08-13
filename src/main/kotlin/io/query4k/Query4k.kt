@@ -1,9 +1,8 @@
 package io.query4k
 
 import arrow.core.Either
-import arrow.core.flatten
 import arrow.core.raise.either
-import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.result.ResultIterable
