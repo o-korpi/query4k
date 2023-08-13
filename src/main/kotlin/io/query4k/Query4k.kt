@@ -214,7 +214,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
      *
      * @param sql SQL query. Do not use string interpolation or concatenation.
      * @param params SQL injection safe parameter inputs. Mapped to in `sql` by the use of `:myparam`.
-     * @return All results mapped to target data class `A`, or wrapped `SQLException`.
+     * @return All results mapped to target data class `A`
      * */
     inline fun <reified A> query(
         sql: String,
