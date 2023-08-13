@@ -185,19 +185,19 @@ class Query4k private constructor(private val jdbi: Jdbi) {
 
     private fun ResultIterable<Map<String, Any>>.safeFindOnly() = Either.catchOrThrow<IllegalStateException, Map<String, Any>> {
         this.findOnly()
-    }.mapLeft { QueryOnlyError.IllegalStateError }
+    }.mapLeft { QueryOnlyException.IllegalStateException }
 
     fun queryOnly(
         handle: Handle,
         sql: String,
         params: Map<String, Any>?
-    ): Either<QueryOnlyError, Map<String, Any>> = Either.catchOrThrow<SQLException, Either<QueryOnlyError.IllegalStateError, Map<String, Any>>> {
+    ): Either<QueryOnlyException, Map<String, Any>> = Either.catchOrThrow<SQLException, Either<io.query4k.QueryOnlyError.IllegalStateException, Map<String, Any>>> {
         handle.createQuery(sql)
             .bindMap(params)
             .mapToMap()
             .safeFindOnly()
     }.mapLeft {
-        QueryOnlyError.ConnectionError
+        QueryOnlyException.ConnectionException
     }.flatten()
 
     /** Gets _all_ results from a query, and maps them to the target model. Will cause raised exceptions on
@@ -240,7 +240,7 @@ class Query4k private constructor(private val jdbi: Jdbi) {
     inline fun <reified A> queryOnly(
         sql: String,
         params: Map<String, Any>? = null
-    ): Either<QueryOnlyError, A> = either {
+    ): Either<QueryOnlyException, A> = either {
         handle().use {  handle ->
             queryOnly(handle, sql, params)
                 .bind()

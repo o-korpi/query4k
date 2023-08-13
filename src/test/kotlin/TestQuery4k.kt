@@ -14,7 +14,7 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.query4k.Query4k
-import io.query4k.QueryOnlyError
+import io.query4k.QueryOnlyException
 import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -192,7 +192,7 @@ class TestQuery4k {
     @Test
     fun `queryOnly should succeed if only one result exists`() {
         insertRows(1)
-        val result: Either<QueryOnlyError, TestTable> = q4k.queryOnly<TestTable>("SELECT * FROM test_table")
+        val result: Either<QueryOnlyException, TestTable> = q4k.queryOnly<TestTable>("SELECT * FROM test_table")
         val value = result.shouldBeRight()
         value.id shouldBe 1L
     }
@@ -200,7 +200,7 @@ class TestQuery4k {
     @Test
     fun `queryOnly should succeed when one row is taken`() {
         insertRows(3)
-        val result: Either<QueryOnlyError, TestTable> = q4k.queryOnly<TestTable>(
+        val result: Either<QueryOnlyException, TestTable> = q4k.queryOnly<TestTable>(
             "SELECT * FROM test_table WHERE id=:id",
             mapOf("id" to 2L)
         )
