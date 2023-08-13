@@ -65,18 +65,18 @@ class Transaction internal constructor(val query4k: Query4k, val handle: Handle)
     inline fun <reified A> query(
         sql: String,
         params: Map<String, Any>? = null
-    ): Either<SQLException, List<A>> = query4k
+    ): List<A> = query4k
         .query(handle, sql, params)
-        .map { it.map { row -> row.toType<A>() } }
+        .map { row -> row.toType<A>() }
 
     /** Gets the first result from a query, and maps it to `A`. Remaining results are ignored.
      * Similar to `query`, see documentation there. */
     inline fun <reified A> queryFirst(
         sql: String,
         params: Map<String, Any>? = null
-    ): Either<SQLException, A?> = query4k
+    ): A? = query4k
         .queryFirst(handle, sql, params)
-        .map { it?.toType<A>() }
+        ?.toType<A>()
 
     /** Gets one, and only one result from the query. If there are less or more `QueryOnlyError` is returned.
      * Other than that, similar to `query`. See documentation there. */

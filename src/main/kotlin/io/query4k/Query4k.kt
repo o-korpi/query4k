@@ -167,23 +167,21 @@ class Query4k private constructor(private val jdbi: Jdbi) {
         handle: Handle,
         sql: String,
         params: Map<String, Any>? = null
-    ): Either<SQLException, List<Map<String, Any>>> = Either.catchOrThrow {
-        handle.createQuery(sql)
-            .bindMap(params)
-            .mapToMap().list()
-    }
+    ): List<Map<String, Any>> = handle
+        .createQuery(sql)
+        .bindMap(params)
+        .mapToMap().list()
 
     fun queryFirst(
         handle: Handle,
         sql: String,
         params: Map<String, Any>?
-    ): Either<SQLException, Map<String, Any>?> = Either.catchOrThrow {
-        handle.createQuery(sql)
-            .bindMap(params)
-            .mapToMap()
-            .findFirst()
-            .getOrNull()
-    }
+    ): Map<String, Any>? = handle
+        .createQuery(sql)
+        .bindMap(params)
+        .mapToMap()
+        .findFirst()
+        .getOrNull()
 
     private fun ResultIterable<Map<String, Any>>.safeFindOnly() = Either.catchOrThrow<IllegalStateException, Map<String, Any>> {
         this.findOnly()
@@ -224,11 +222,8 @@ class Query4k private constructor(private val jdbi: Jdbi) {
     inline fun <reified A> query(
         sql: String,
         params: Map<String, Any>? = null
-    ): Either<SQLException, List<A>> = either {
-        handle().use { handle ->
-            val results = query(handle, sql, params).bind()
-            results.map { row -> row.toType<A>() }
-        }
+    ): List<A> = handle().use { handle ->
+        query(handle, sql, params).map { row -> row.toType<A>() }
     }
 
     /** Gets the first result from a query, and maps it to `A`. Remaining results are ignored.
@@ -236,11 +231,8 @@ class Query4k private constructor(private val jdbi: Jdbi) {
     inline fun <reified A> queryFirst(
         sql: String,
         params: Map<String, Any>? = null
-    ): Either<SQLException, A?> = either {
-        handle().use { handle ->
-            queryFirst(handle, sql, params).bind()
-                ?.toType<A>()
-        }
+    ): A? = handle().use { handle ->
+            queryFirst(handle, sql, params)?.toType<A>()
     }
 
     /** Gets one, and only one result from the query. If there are less or more `QueryOnlyError` is returned.
