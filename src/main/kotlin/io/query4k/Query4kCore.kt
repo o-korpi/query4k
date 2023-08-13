@@ -27,6 +27,12 @@ class Query4kCore(internal val jdbi: Jdbi) {
         .list()
 
 
+    fun throwKeyMappingError(key: String, className: String): Nothing =
+        throw IllegalArgumentException("Key '$key' cannot be mapped to $className")
+
+    fun throwKeyNotFoundError(key: String): Nothing =
+        throw IllegalArgumentException("There is no auto-generated key '$key' associated with this table")
+
     @ApiStatus.Experimental
     inline fun <reified A> executeGetKey(
         handle: Handle,
@@ -39,10 +45,13 @@ class Query4kCore(internal val jdbi: Jdbi) {
         .mapToMap()
         .findOnly()[key]
         ?.let {
-            Either.catch {
+            runCatching {
                 it.singleToType<A>()
-            }.mapLeft { throw IllegalArgumentException("Key '$key' cannot be mapped to ${A::class}") }.getOrNull()!!  // TODO: Refactor
-        } ?: throw IllegalArgumentException("There is no auto-generated key '$key' associated with this table")
+            }.fold(
+                { it },
+                { throwKeyMappingError(key, A::class.toString()) }
+            )
+        } ?: throwKeyNotFoundError(key)
 
     @ApiStatus.Experimental
     inline fun <reified A> executeGetKeys(
@@ -56,10 +65,12 @@ class Query4kCore(internal val jdbi: Jdbi) {
         .mapToMap()
         .list()
         .map {
-            Either.catch {
-                it[key]?.singleToType<A>()
-                    ?: throw IllegalArgumentException("There is no auto-generated key '$key' associated with this table")  // TODO: Refactor
-            }.mapLeft { throw IllegalArgumentException("Key '$key' cannot be mapped to ${A::class}") }.getOrNull()!!
+            runCatching {
+                it[key]?.singleToType<A>() ?: throwKeyNotFoundError(key)
+            }.fold(
+                { it },
+                { throwKeyMappingError(key, A::class.toString()) }
+            )
         }
 
     fun query(
