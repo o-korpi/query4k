@@ -241,13 +241,11 @@ class Query4k private constructor(private val jdbi: Jdbi) {
 
     fun handle(): Handle = jdbi.open()
 
-    fun transaction(operations: suspend Transaction.() -> Unit) {
-        jdbi.open().useTransaction<SQLException> {
+    fun <A> transaction(operations: Transaction.() -> A): A =
+        jdbi.open().inTransaction<A, SQLException> {
             val transaction = Transaction(this, it)
-            runBlocking {
-                transaction.operations()
-            }
+            transaction.operations()
         }
-    }
+
 }
 
