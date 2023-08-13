@@ -5,7 +5,7 @@ import org.jdbi.v3.core.Handle
 import org.jetbrains.annotations.ApiStatus.Experimental
 import java.sql.SQLException
 
-class Transaction internal constructor(val query4k: Query4k, val handle: Handle) {
+class Transaction internal constructor(val query4k: Query4kCore, val handle: Handle) {
     /** Executes a single SQL statement.
      * Example use:
      *
