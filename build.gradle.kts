@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "io.korpi"
-version = "0.4.0"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -73,7 +73,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "io.korpi"
             artifactId = "query4k"
-            version = "0.4.0"
+            version = "1.0.0"
 
             pom {
                 name.set("query4k")

@@ -3,7 +3,7 @@
 
 # query4k
 
-Most recent version: 0.4.0
+Most recent version: 1.0.0
 
 ---
 
