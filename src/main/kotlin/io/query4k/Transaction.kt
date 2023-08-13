@@ -1,7 +1,6 @@
 package io.query4k
 
 import arrow.core.Either
-import arrow.core.raise.either
 import org.jdbi.v3.core.Handle
 import org.jetbrains.annotations.ApiStatus.Experimental
 import java.sql.SQLException
@@ -83,7 +82,7 @@ class Transaction internal constructor(val query4k: Query4k, val handle: Handle)
     inline fun <reified A> queryOnly(
         sql: String,
         params: Map<String, Any>? = null
-    ): Either<QueryOnlyError, A> = query4k
+    ): Either<QueryOnlyException, A> = query4k
         .queryOnly(handle, sql, params)
         .map{ it.toType<A>() }
 

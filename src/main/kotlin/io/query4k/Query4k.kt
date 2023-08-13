@@ -185,20 +185,17 @@ class Query4k private constructor(private val jdbi: Jdbi) {
 
     private fun ResultIterable<Map<String, Any>>.safeFindOnly() = Either.catchOrThrow<IllegalStateException, Map<String, Any>> {
         this.findOnly()
-    }.mapLeft { QueryOnlyException.IllegalStateException }
+    }.mapLeft { QueryOnlyException }
 
     fun queryOnly(
         handle: Handle,
         sql: String,
         params: Map<String, Any>?
-    ): Either<QueryOnlyException, Map<String, Any>> = Either.catchOrThrow<SQLException, Either<io.query4k.QueryOnlyError.IllegalStateException, Map<String, Any>>> {
-        handle.createQuery(sql)
-            .bindMap(params)
-            .mapToMap()
-            .safeFindOnly()
-    }.mapLeft {
-        QueryOnlyException.ConnectionException
-    }.flatten()
+    ): Either<QueryOnlyException, Map<String, Any>> = handle.createQuery(sql)
+        .bindMap(params)
+        .mapToMap()
+        .safeFindOnly()
+
 
     /** Gets _all_ results from a query, and maps them to the target model. Will cause raised exceptions on
      * invalid target model. Example use:
