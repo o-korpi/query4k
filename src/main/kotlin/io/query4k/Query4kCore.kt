@@ -7,6 +7,7 @@ import org.jdbi.v3.core.result.ResultIterable
 import org.jetbrains.annotations.ApiStatus
 import kotlin.jvm.optionals.getOrNull
 
+@ApiStatus.Internal
 class Query4kCore(internal val jdbi: Jdbi) {
 
     internal fun execute(
