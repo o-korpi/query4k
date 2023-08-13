@@ -1,4 +1,3 @@
-import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equals.shouldBeEqual
 import io.query4k.serializers.BigDecimalSerializer
@@ -343,14 +342,14 @@ class TestDate : TypeTest {
 
     @Test
     fun `unsafe insert should work`() {
-        val date: LocalDate = LocalDate(2023, 8, 5)
+        val date = LocalDate(2023, 8, 5)
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES ('$date')")
         result shouldBeEqual 1
     }
 
     @Test
     fun `inserts should work`() {
-        val date: LocalDate = LocalDate(2023, 8, 5)
+        val date = LocalDate(2023, 8, 5)
         val result = q4k.execute("INSERT INTO $tableName (test) VALUES :test",
             mapOf("test" to date.toSQLParseable())
         )
