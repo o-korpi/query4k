@@ -23,7 +23,7 @@ with `@Serializable`!
 Tested with H2 and PostgreSQL, should work with any SQL database.
 
 ---
-## Documentation
+## Getting started
 
 More details at https://github.com/o-korpi/query4k/wiki/Documentation. 
 
@@ -91,50 +91,3 @@ q4k.transaction {
 }
 ```
 
-
-### Type support
-
-#### Full support
-
-The following types are fully supported, but require `kotlinx.datetime`:
-- `LocalTime`
-- `LocalDate`
-
-To use these, you need the following dependency:
-
-`implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")`
-
-When making inserts with these types you also need to use `.toSQLParseable()`. Example:
-```kotlin
-q4k.insert(
-    "INSERT INTO my_table (date) VALUES :date", 
-    mapOf("date" to LocalDate(2023, 8, 1).toSQLParseable())
-)
-```
-
-#### Partial support
-
-These are only partially supported:
-- `UUID`
-- `LocalDateTime`
-
-##### UUID
-
-In the case of `UUID`, injection-safe inserts are not possible, and you have to
-use string interpolation to insert your UUID yourself. Example:
-
-`q4k.insert("INSERT INTO my_table (uuid) VALUES (${myUUID.toSQLParseable()})")`
-
-Use of UUID requires the kotlinx UUID library.
-
-`implementation("app.softwork:kotlinx-uuid-core:0.0.21")`
-
-##### LocalDateTime
-
-With LocalDateTime, queries are currently not possible. It is possible to do
-inserts, however. LocalDateTime requires the `kotlinx.datetime` library.
-
-#### Unsupported
-
-These types are currently unsupported:
-- Arrays
